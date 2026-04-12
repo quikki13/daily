@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@tailwind utilities;
+
+:root {
+  @apply bg-slate-50 text-slate-900;
+}
