@@ -25,7 +25,7 @@ const setView = (view: 'calendar' | 'list') => {
 </script>
 
 <template>
-  <header class="sticky top-0 z-50 p-2 w-full border-b bg-white/80 backdrop-blur-md">
+  <header class="sticky top-0 z-50 p-2 w-full border-b border-slate-400 bg-white/80 backdrop-blur-md">
     <div class="container mx-auto flex h-16 items-center justify-between px-4">
       <div class="flex items-center gap-2">
         <div
