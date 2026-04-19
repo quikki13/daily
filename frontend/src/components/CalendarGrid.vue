@@ -3,11 +3,14 @@ import { ref, computed } from 'vue';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { getCalendarGrid } from '@/utils/calendar';
 import { WEEK_DAYS, MONTH_NAMES } from '@/consts/calendar';
+import { useEntriesStore } from '@/stores/entries';
 
 // Инициализируем текущую дату
 const today = new Date();
 const currentYear = ref(today.getFullYear());
 const currentMonth = ref(today.getMonth());
+
+const entriesStore = useEntriesStore();
 
 /**
  * Вычисляем сетку дней на основе выбранного года и месяца.
@@ -81,7 +84,23 @@ const prevMonth = () => {
           {{ date.getDate() }}
         </span>
 
-        <div class="mt-auto flex flex-wrap">
+        <div class="mt-auto flex flex-wrap gap-1">
+          <div v-for="entry in entriesStore.getEntriesByDate(date)" :key="entry.id"
+            class="relative flex items-center justify-center">
+            <div class="cursor-[url(@/assets/cursor.cur),pointer] p-1 peer">
+              <div class="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-indigo-500"></div>
+            </div>
+
+            <!-- tooltip -->
+            <div
+              class="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden w-max max-w-50 -translate-x-1/2 rounded-lg bg-slate-500 px-3 py-2 text-xs font-medium text-white shadow-xl peer-hover:block">
+              <p class="truncate whitespace-normal line-clamp-3">
+                {{ entry.content }}
+              </p>
+
+              <div class="absolute left-1/2 -bottom-1 -mt-px h-2 w-2 -translate-x-1/2 rotate-45 bg-slate-500"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { GRID_CELLS, MONTH_NAMES, WEEK_DAYS } from '@/consts/calendar';
+import { GRID_CELLS } from '@/consts/calendar';
 
 export interface CalendarDay {
   date: Date;

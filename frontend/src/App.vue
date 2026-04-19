@@ -1,37 +1,33 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import api from './api';
 
+import { useEntriesStore } from '@/stores/entries';
 import AppHeader from '@/components/AppHeader.vue';
 import CalendarGrid from '@/components/CalendarGrid.vue';
 import EntryForm from '@/components/EntryForm.vue';
 
-const entries = ref([]);
 const isFormOpen = ref(false);
 
 const currentView = ref<'calendar' | 'list'>('calendar');
+
+const entriesStore = useEntriesStore();
 
 const handleAddEntry = () => {
   isFormOpen.value = true;
 }
 
 const handleSuccess = () => {
-  console.log('Запись добавлена');
+  entriesStore.fetchEntries();
 }
 
 const handleChangeView = (view: 'list' | 'calendar') => {
   currentView.value = view;
 }
 
-onMounted(async () => {
-  try {
-    const { data } = await api.get('/api/entries');
-    entries.value = data;
-    console.log('Данные с бэкенда получены:', entries.value);
-  } catch (error) {
-    console.error('Ошибка связи с сервером:', error);
-  }
+onMounted(() => {
+  entriesStore.fetchEntries();
 });
+
 </script>
 
 <template>
