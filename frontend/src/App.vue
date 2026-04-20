@@ -4,6 +4,7 @@ import { onMounted, ref } from 'vue';
 import { useEntriesStore } from '@/stores/entries';
 import AppHeader from '@/components/AppHeader.vue';
 import CalendarGrid from '@/components/CalendarGrid.vue';
+import ListView from '@/components/ListView.vue';
 import EntryForm from '@/components/EntryForm.vue';
 
 const isFormOpen = ref(false);
@@ -39,7 +40,7 @@ onMounted(() => {
         <CalendarGrid />
       </div>
       <div v-else class="py-10 text-center">
-        <h2 class="text-2xl text-slate-400">Здесь будет список записей</h2>
+        <ListView />
       </div>
     </main>
 
