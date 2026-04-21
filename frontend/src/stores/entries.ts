@@ -50,10 +50,21 @@ export const useEntriesStore = defineStore("entries", () => {
     return filtered;
   };
 
+  const deleteEntry = async (id: string) => {
+    try {
+      await api.delete(`/api/entries/${id}`);
+      entries.value = entries.value.filter((entry) => entry.id !== id);
+    } catch (error) {
+      console.error("Ошибка при удалении:", error);
+      alert("Не удалось удалить запись");
+    }
+  };
+
   return {
     entries,
     isLoading,
     getEntriesByDate,
     fetchEntries,
+    deleteEntry,
   };
 });

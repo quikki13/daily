@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { getCalendarGrid } from '@/utils/calendar';
 import { WEEK_DAYS, MONTH_NAMES } from '@/consts/calendar';
 import { useEntriesStore } from '@/stores/entries';
+import type { Entry } from '@/stores/entries';
+import EntryViewModal from '@/components/EntryViewModal.vue';
 
 // Инициализируем текущую дату
 const today = new Date();
@@ -11,6 +13,19 @@ const currentYear = ref(today.getFullYear());
 const currentMonth = ref(today.getMonth());
 
 const entriesStore = useEntriesStore();
+
+// Состояние для модалки просмотра
+const isViewModalOpen = ref(false);
+const selectedEntry = ref<Entry | null>(null);
+
+const openEntryDetails = (entry: Entry) => {
+  selectedEntry.value = entry;
+  isViewModalOpen.value = true;
+};
+
+const closeEntryDetails = () => {
+  isViewModalOpen.value = false;
+}
 
 /**
  * Вычисляем сетку дней на основе выбранного года и месяца.
@@ -87,7 +102,7 @@ const prevMonth = () => {
         <div class="mt-auto flex flex-wrap gap-1">
           <div v-for="entry in entriesStore.getEntriesByDate(date)" :key="entry.id"
             class="relative flex items-center justify-center">
-            <div class="cursor-[url(@/assets/cursor.cur),pointer] p-1 peer">
+            <div class="cursor-[url(@/assets/cursor.cur),pointer] p-1 peer" @click.stop="openEntryDetails(entry)">
               <div class="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-indigo-500"></div>
             </div>
 
@@ -106,4 +121,6 @@ const prevMonth = () => {
     </div>
 
   </div>
+
+  <EntryViewModal :is-open="isViewModalOpen" :entry="selectedEntry" @close="closeEntryDetails" />
 </template>

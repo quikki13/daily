@@ -34,7 +34,7 @@ app.post("/api/entries", async (req: Request, res: Response) => {
       include: { tags: true },
     });
 
-    console.log('Добавили запись')
+    console.log("Добавили запись");
     res.status(201).json(entry);
   } catch (err) {
     console.error("Ошибка создания:", err);
@@ -58,33 +58,50 @@ app.get("/api/entries", async (req: Request, res: Response) => {
     };
   }
 
-    if (tags) {
-      const tagNames = (tags as string).split(",");
-      where.tags = {
-        some: {
-          name: {
-            in: tagNames,
-          },
+  if (tags) {
+    const tagNames = (tags as string).split(",");
+    where.tags = {
+      some: {
+        name: {
+          in: tagNames,
         },
-      };
-    }
+      },
+    };
+  }
 
-    // where  сформировали
+  // where  сформировали
 
-    try {
-      const entries = await prisma.entry.findMany({
-        where,
-        include: { tags: true },
-        orderBy: { date: "desc" },
-      });
+  try {
+    const entries = await prisma.entry.findMany({
+      where,
+      include: { tags: true },
+      orderBy: { date: "desc" },
+    });
 
-      res.status(200).json(entries);
-    } catch (err) {
-      res.status(500).json({ error: "Не удалось получить данные" });
-    }
-  });
+    res.status(200).json(entries);
+  } catch (err) {
+    res.status(500).json({ error: "Не удалось получить данные" });
+  }
+});
 
+/**
+ * DELETE /api/entries/:id — Удаление записи
+ */
+app.delete("/api/entries/:id", async (req: Request, res: Response) => {
+  const id = req.params.id?.toString();
 
+  console.log(id);
+
+  try {
+    id &&
+      (await prisma.entry.delete({
+        where: { id },
+      }));
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: "Не удалось получить данные" });
+  }
+});
 
 const PORT = 3000;
 app.listen(PORT, () => {

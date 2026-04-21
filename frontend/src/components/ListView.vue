@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Calendar as CalendarIcon, Tag as TagIcon, CalendarArrowDownIcon, CalendarArrowUpIcon } from 'lucide-vue-next';
+import { Calendar as CalendarIcon, Tag as TagIcon, CalendarArrowDownIcon, CalendarArrowUpIcon, Trash2 } from 'lucide-vue-next';
 import { useEntriesStore } from '@/stores/entries';
 
 const store = useEntriesStore();
@@ -34,6 +34,12 @@ const onChangeSort = () => {
   sorting.value === 'new' ? sorting.value = 'old' : sorting.value = 'new';
 }
 
+const confirmDelete = (id: string) => {
+  if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+    store.deleteEntry(id);
+  }
+}
+
 </script>
 
 <template>
@@ -60,11 +66,19 @@ const onChangeSort = () => {
 
       <article v-for="{ date, id, tags, content } in sortedEntries" :key="id"
         class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-        <header class="mb-3 flex items-center gap-1.5 text-sm font-medium text-indigo-600">
-          <CalendarIcon :size="16" />
-          <time :datetime="date" class="capitalize">
-            {{ formatDisplayDate(date) }}
-          </time>
+        <header class="mb-3 flex flex-row justify-between">
+          <div class="flex items-center gap-1.5 text-sm font-medium text-indigo-600">
+            <CalendarIcon :size="16" />
+            <time :datetime="date" class="capitalize">
+              {{ formatDisplayDate(date) }}
+            </time>
+          </div>
+
+          <button @click="confirmDelete(id)"
+            class="rounded-lg p-2 text-slate-400 transition-all hover:bg-red-50 hover:text-red-500"
+            title="Удалить запись">
+            <Trash2 :size="18" />
+          </button>
         </header>
 
         <p class="mb-4 whitespace-pre-wrap text-slate-700">
