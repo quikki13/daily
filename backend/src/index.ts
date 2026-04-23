@@ -90,8 +90,6 @@ app.get("/api/entries", async (req: Request, res: Response) => {
 app.delete("/api/entries/:id", async (req: Request, res: Response) => {
   const id = req.params.id?.toString();
 
-  console.log(id);
-
   try {
     id &&
       (await prisma.entry.delete({
@@ -102,6 +100,49 @@ app.delete("/api/entries/:id", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Не удалось получить данные" });
   }
 });
+
+/**
+ * PUT /api/entries/:id — Редактирование записи
+ */
+const updatedEntry = app.put(
+  "/api/entries/:id",
+  async (req: Request, res: Response) => {
+    const id = req.params.id?.toString();
+    const { content, tags, date } = req.body;
+
+    try {
+      id &&
+        (await prisma.entry.update({
+          where: { id },
+          data: {
+            content,
+            date: new Date(date),
+
+            tags: {
+              // Разрываем все существующие связи в промежуточной таблице
+              set: [],
+
+              // Создаем новые
+              connectOrCreate: tags.map((name: string) => ({
+                where: { name },
+                create: { name },
+              })),
+            },
+          },
+          include: { tags: true },
+        }));
+
+      res.status(200).json(updatedEntry);
+    } catch (err: any) {
+      if (err.code === "P2025") {
+        res.status(404).json({ error: "Запись не найдена" });
+      } else {
+        console.error("Ошибка обновления:", err);
+        res.status(500).json({ error: "Не удалось обновить запись" });
+      }
+    }
+  },
+);
 
 const PORT = 3000;
 app.listen(PORT, () => {

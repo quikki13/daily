@@ -14,17 +14,20 @@ const currentMonth = ref(today.getMonth());
 
 const entriesStore = useEntriesStore();
 
+const emit = defineEmits<{
+  (e: 'edit-entry', etry: Entry): void;
+}>();
+
 // Состояние для модалки просмотра
 const isViewModalOpen = ref(false);
 const selectedEntry = ref<Entry | null>(null);
 
-const openEntryDetails = (entry: Entry) => {
-  selectedEntry.value = entry;
-  isViewModalOpen.value = true;
-};
-
 const closeEntryDetails = () => {
   isViewModalOpen.value = false;
+}
+
+const openEntryDetails = (entry: Entry) => {
+  emit('edit-entry', entry);
 }
 
 /**

@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Calendar as CalendarIcon, Tag as TagIcon, CalendarArrowDownIcon, CalendarArrowUpIcon, Trash2 } from 'lucide-vue-next';
+import { Calendar as CalendarIcon, Tag as TagIcon, CalendarArrowDownIcon, CalendarArrowUpIcon, Trash2, Edit2 } from 'lucide-vue-next';
 import { useEntriesStore } from '@/stores/entries';
 
+import { type Entry } from '@/stores/entries';
+
 const store = useEntriesStore();
+
+const emit = defineEmits<{
+  (e: 'edit-entry', etry: Entry): void;
+}>();
 
 const sorting = ref<'new' | 'old'>('new');
 
@@ -40,6 +46,10 @@ const confirmDelete = (id: string) => {
   }
 }
 
+const onEntryEdit = (entry: Entry) => {
+  emit('edit-entry', entry);
+}
+
 </script>
 
 <template>
@@ -64,29 +74,38 @@ const confirmDelete = (id: string) => {
         <CalendarArrowUpIcon v-else-if="sorting === 'old'" :size="20" />
       </button>
 
-      <article v-for="{ date, id, tags, content } in sortedEntries" :key="id"
+      <article v-for="entry in sortedEntries" :key="entry.id"
         class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
         <header class="mb-3 flex flex-row justify-between">
           <div class="flex items-center gap-1.5 text-sm font-medium text-indigo-600">
             <CalendarIcon :size="16" />
-            <time :datetime="date" class="capitalize">
-              {{ formatDisplayDate(date) }}
+            <time :datetime="entry.date" class="capitalize">
+              {{ formatDisplayDate(entry.date) }}
             </time>
           </div>
 
-          <button @click="confirmDelete(id)"
-            class="rounded-lg p-2 text-slate-400 transition-all hover:bg-red-50 hover:text-red-500"
-            title="Удалить запись">
-            <Trash2 :size="18" />
-          </button>
+          <div class="flex flex-row gap-1">
+            <button @click="onEntryEdit(entry)"
+              class="rounded-lg p-2 text-slate-400 cursor-pointer transition-all hover:bg-slate-50 hover:text-slate-500"
+              title="Редактировать запись">
+              <Edit2 :size="18" />
+            </button>
+
+            <button @click="confirmDelete(entry.id)"
+              class="rounded-lg p-2 text-slate-400 cursor-pointer transition-all hover:bg-red-50 hover:text-red-500"
+              title="Удалить запись">
+              <Trash2 :size="18" />
+            </button>
+          </div>
+
         </header>
 
         <p class="mb-4 whitespace-pre-wrap text-slate-700">
-          {{ content }}
+          {{ entry.content }}
         </p>
 
-        <footer v-if="tags && tags.length > 0" class="flex flex-wrap gap-2">
-          <span v-for="tag in tags" :key="tag.id"
+        <footer v-if="entry.tags && entry.tags.length > 0" class="flex flex-wrap gap-2">
+          <span v-for="tag in entry.tags" :key="tag.id"
             class="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 cursor-pointer transition-colors hover:text-slate-700 hover:bg-slate-200">
             <TagIcon :size="12" />
             {{ tag.name }}

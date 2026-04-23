@@ -60,11 +60,32 @@ export const useEntriesStore = defineStore("entries", () => {
     }
   };
 
+  const updateEntry = async (
+    id: string,
+    updateData: { content: string; date: string; tags: string[] },
+  ) => {
+    try {
+      const { data }: { data: Entry } = await api.put(`/api/entries/${id}`, {
+        content: updateData.content,
+        date: updateData.date,
+        tags: updateData.tags,
+      });
+
+      entries.value = entries.value.map((entry) =>
+        entry.id === data.id ? data : entry,
+      );
+    } catch (error) {
+      console.error("Ошибка при редактировании", error);
+      throw error;
+    }
+  };
+
   return {
     entries,
     isLoading,
     getEntriesByDate,
     fetchEntries,
     deleteEntry,
+    updateEntry,
   };
 });
