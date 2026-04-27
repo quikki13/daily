@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 import api from "@/api";
 
@@ -19,6 +19,8 @@ export const useEntriesStore = defineStore("entries", () => {
   const entries = ref<Entry[]>([]);
   const isLoading = ref<boolean>(false);
 
+  const selectedTags = ref<string[]>([]);
+
   //
   //
   // ACTIONS
@@ -28,13 +30,57 @@ export const useEntriesStore = defineStore("entries", () => {
     try {
       isLoading.value = true;
 
-      const { data } = await api.get("/api/entries");
+      const params = new URLSearchParams();
+
+      if (selectedTags.value.length) {
+        params.append("tags", selectedTags.value.join(","));
+      }
+
+      const { data } = await api.get(`/api/entries?${params.toString()}`);
       entries.value = data;
     } catch (e) {
       console.error("Ошибка загрузки записей:", e);
     } finally {
       isLoading.value = false;
     }
+  };
+
+  /**
+   * Метод получения всех уникальных тэгов из уже загруженных записей
+   */
+  const allUniqueTags = computed(() => {
+    const set = new Set<string>();
+
+    if (!entries.value.length) {
+      return [];
+    } else {
+      entries.value.forEach(({ tags }) => {
+        if (tags.length) {
+          tags.forEach(({ name }) => {
+            set.add(name);
+          });
+        }
+      });
+
+      return Array.from(set).sort();
+    }
+  });
+
+  /**
+   * Метод удаления/добавления тэгов в UI
+   */
+  const toggleTag = (tagName: string) => {
+    const index = selectedTags.value.findIndex((tag) => tag === tagName);
+
+    if (index >= 0) {
+      // тут мутируем selectedTags - это ок
+      // оно нам и надо чтобы реактивно список тэгов обновить
+      selectedTags.value.splice(index, 1);
+    } else {
+      selectedTags.value.push(tagName);
+    }
+    // После изменения фильтров сразу обновляем данные
+    fetchEntries();
   };
 
   const getEntriesByDate = (key: Date) => {
@@ -82,7 +128,10 @@ export const useEntriesStore = defineStore("entries", () => {
 
   return {
     entries,
+    allUniqueTags,
+    selectedTags,
     isLoading,
+    toggleTag,
     getEntriesByDate,
     fetchEntries,
     deleteEntry,

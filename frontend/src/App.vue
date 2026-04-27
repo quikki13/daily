@@ -6,16 +6,23 @@ import AppHeader from '@/components/AppHeader.vue';
 import CalendarGrid from '@/components/CalendarGrid.vue';
 import ListView from '@/components/ListView.vue';
 import EntryForm from '@/components/EntryForm.vue';
+import TagFilter from '@/components/TagFilter.vue';
 
 import { type Entry } from '@/stores/entries';
 
 const isFormOpen = ref(false);
 
 const currentView = ref<'calendar' | 'list'>('calendar');
-
 const entryToEdit = ref<null | Entry>(null);
 
+// Для ListView 
+const sorting = ref<'new' | 'old'>('new');
+
 const entriesStore = useEntriesStore();
+
+const handleChangeSorting = (sortingArg: 'new' | 'old') => {
+  sorting.value = sortingArg;
+}
 
 const handleAddEntry = () => {
   isFormOpen.value = true;
@@ -50,15 +57,16 @@ onMounted(() => {
     <AppHeader @add-entry="handleAddEntry" @change-view="handleChangeView" />
 
     <main class="container mx-auto p-4">
+      <TagFilter :sorting="currentView === 'list' ? sorting : null" @change-sorting="handleChangeSorting" />
+
       <div v-if="currentView === 'calendar'" class="py-10 text-center">
         <CalendarGrid @edit-entry="handleEditEntry" />
       </div>
       <div v-else class="py-10 text-center">
-        <ListView @edit-entry="handleEditEntry" />
+        <ListView :sorting="sorting" @edit-entry="handleEditEntry" />
       </div>
     </main>
 
-    <EntryForm :is-open="isFormOpen" :entry-to-edit="entryToEdit" @close="onCloseForm"
-      @success="handleSuccess" />
+    <EntryForm :is-open="isFormOpen" :entry-to-edit="entryToEdit" @close="onCloseForm" @success="handleSuccess" />
   </div>
 </template>

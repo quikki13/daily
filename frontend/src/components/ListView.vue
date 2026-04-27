@@ -1,22 +1,25 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Calendar as CalendarIcon, Tag as TagIcon, CalendarArrowDownIcon, CalendarArrowUpIcon, Trash2, Edit2 } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { Calendar as CalendarIcon, Tag as TagIcon, CalendarArrowUpIcon, Trash2, Edit2 } from 'lucide-vue-next';
 import { useEntriesStore } from '@/stores/entries';
 
 import { type Entry } from '@/stores/entries';
 
 const store = useEntriesStore();
 
+const props = defineProps<{
+  sorting: 'new' | 'old';
+}>();
+
+
 const emit = defineEmits<{
   (e: 'edit-entry', etry: Entry): void;
 }>();
 
-const sorting = ref<'new' | 'old'>('new');
-
 const sortedEntries = computed(() => {
   return [...store.entries].sort((a, b) => {
-    const first = sorting.value === 'new' ? b.date : a.date;
-    const second = sorting.value === 'new' ? a.date : b.date;
+    const first = props.sorting === 'new' ? b.date : a.date;
+    const second = props.sorting === 'new' ? a.date : b.date;
 
     return new Date(first).getTime() - new Date(second).getTime();
   });
@@ -35,10 +38,6 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
 const formatDisplayDate = (isoString: string) => {
   return dateFormatter.format(new Date(isoString));
 };
-
-const onChangeSort = () => {
-  sorting.value === 'new' ? sorting.value = 'old' : sorting.value = 'new';
-}
 
 const confirmDelete = (id: string) => {
   if (confirm('Вы уверены, что хотите удалить эту запись?')) {
@@ -68,11 +67,6 @@ const onEntryEdit = (entry: Entry) => {
     </div>
 
     <div v-else class="space-y-4 flex flex-col">
-      <button @click="onChangeSort"
-        class="w-fit p-2 rounded-md cursor-pointer bg-slate-200 text-slate-400 transition-colors hover:bg-slate-300 hover:text-slate-500">
-        <CalendarArrowDownIcon v-if="sorting === 'new'" :size="20" />
-        <CalendarArrowUpIcon v-else-if="sorting === 'old'" :size="20" />
-      </button>
 
       <article v-for="entry in sortedEntries" :key="entry.id"
         class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
