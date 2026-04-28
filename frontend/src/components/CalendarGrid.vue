@@ -16,6 +16,7 @@ const entriesStore = useEntriesStore();
 
 const emit = defineEmits<{
   (e: 'edit-entry', etry: Entry): void;
+  (e: 'create-at', entry: Date): void;
 }>();
 
 // Состояние для модалки просмотра
@@ -24,6 +25,10 @@ const selectedEntry = ref<Entry | null>(null);
 
 const closeEntryDetails = () => {
   isViewModalOpen.value = false;
+}
+
+const createEntry = (date: Date) => {
+  emit('create-at', date);
 }
 
 const openEntryDetails = (entry: Entry) => {
@@ -90,7 +95,7 @@ const prevMonth = () => {
     </div>
 
     <div class="grid grid-cols-7 gap-1 md:gap-2">
-      <div v-for="({ isCurrentMonth, isToday, date }, index) in calendarDays" :key="index" :class="[
+      <div v-for="({ isCurrentMonth, isToday, date }, index) in calendarDays" :key="index" @click="createEntry(date)" :class="[
         'relative flex h-14 md:h-24 flex-col rounded-xl border p-1 transition-colors md:p-2',
         isCurrentMonth ? 'bg-white border-slate-100' : 'bg-slate-50/50 border-transparent text-slate-400',
         isToday ? 'ring-2 ring-indigo-500 border-transparent' : 'hover:border-indigo-200'

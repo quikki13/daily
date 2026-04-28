@@ -96,6 +96,9 @@ export const useEntriesStore = defineStore("entries", () => {
     return filtered;
   };
 
+  /**
+   * Метод удаления записи entry
+   */
   const deleteEntry = async (id: string) => {
     try {
       await api.delete(`/api/entries/${id}`);
@@ -106,6 +109,9 @@ export const useEntriesStore = defineStore("entries", () => {
     }
   };
 
+  /**
+   * Метод обновления entry
+   */
   const updateEntry = async (
     id: string,
     updateData: { content: string; date: string; tags: string[] },

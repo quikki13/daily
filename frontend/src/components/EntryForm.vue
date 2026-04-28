@@ -14,6 +14,7 @@ import api from '@/api';
 const props = defineProps<{
   isOpen: boolean;
   entryToEdit: Entry | null; // Если null — режим создания, если есть объект — редактирование
+  initialDate: string;
 }>();
 
 /**
@@ -26,7 +27,7 @@ const emit = defineEmits<{
 
 // Локальное состояние полей формы
 const content = ref('');
-const date = ref(new Date().toISOString().split('T')[0]); // По умолчанию сегодня (ГГГГ-ММ-ДД)
+const date = ref(props.initialDate); // По умолчанию сегодня (ГГГГ-ММ-ДД)
 const tagsString = ref(''); // Теги вводом через запятую
 
 const isLoading = ref(false);
@@ -39,7 +40,7 @@ watch(() => props.entryToEdit, (_new, _old) => {
   } else {
     content.value = '';
     tagsString.value = '';
-    date.value = formatDateForApi(new Date());
+    date.value = props.initialDate;
   }
 })
 
@@ -64,7 +65,6 @@ const handleSubmit = async () => {
   }
 
   try {
-
     if (props.entryToEdit) {
       await api.put(`/api/entries/${props.entryToEdit.id}`, data);
     } else {

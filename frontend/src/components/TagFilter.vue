@@ -42,6 +42,7 @@ const clearFilters = () => {
       Фильтры:
     </div>
 
+
     <button v-for="tag in allUniqueTags" :key="tag" @click="toggleTag(tag)" :class="[
       'rounded-full px-3 py-1 text-xs font-medium transition-all border',
       selectedTags.includes(tag)
@@ -50,6 +51,7 @@ const clearFilters = () => {
     ]">
       {{ tag }}
     </button>
+
 
     <button v-if="selectedTags.length > 0" @click="clearFilters"
       class="flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600 transition-colors">
