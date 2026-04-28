@@ -54,8 +54,24 @@ const onEntryEdit = (entry: Entry) => {
 <template>
   <div class="mx-auto max-w-3xl space-y-6">
 
-    <div v-if="store.isLoading" class="py-10 text-center animate-pulse cursor-default text-slate-400">
-      Загрузка записей...
+    <div v-if="store.isLoading" class="space-y-4">
+      <div v-for="i in 3" :key="i" class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div class="mb-4 flex items-center gap-2">
+          <div class="h-4 w-4 rounded-full bg-slate-200 animate-pulse"></div>
+          <div class="h-4 w-32 rounded bg-slate-200 animate-pulse"></div>
+        </div>
+
+        <div class="mb-4 space-y-2">
+          <div class="h-3 w-full rounded bg-slate-200 animate-pulse"></div>
+          <div class="h-3 w-5/6 rounded bg-slate-200 animate-pulse"></div>
+          <div class="h-3 w-4/6 rounded bg-slate-200 animate-pulse"></div>
+        </div>
+
+        <div class="flex gap-2">
+          <div class="h-6 w-16 rounded-md bg-slate-200 animate-pulse"></div>
+          <div class="h-6 w-24 rounded-md bg-slate-200 animate-pulse"></div>
+        </div>
+      </div>
     </div>
 
     <div v-else-if="sortedEntries.length === 0" class="py-20 text-center cursor-default">

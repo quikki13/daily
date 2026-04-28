@@ -95,11 +95,12 @@ const prevMonth = () => {
     </div>
 
     <div class="grid grid-cols-7 gap-1 md:gap-2">
-      <div v-for="({ isCurrentMonth, isToday, date }, index) in calendarDays" :key="index" @click="createEntry(date)" :class="[
-        'relative flex h-14 md:h-24 flex-col rounded-xl border p-1 transition-colors md:p-2',
-        isCurrentMonth ? 'bg-white border-slate-100' : 'bg-slate-50/50 border-transparent text-slate-400',
-        isToday ? 'ring-2 ring-indigo-500 border-transparent' : 'hover:border-indigo-200'
-      ]">
+      <div v-for="({ isCurrentMonth, isToday, date }, index) in calendarDays" :key="index" @click="createEntry(date)"
+        :class="[
+          'relative flex h-14 md:h-24 flex-col rounded-xl border p-1 transition-colors md:p-2',
+          isCurrentMonth ? 'bg-white border-slate-100' : 'bg-slate-50/50 border-transparent text-slate-400',
+          isToday ? 'ring-2 ring-indigo-500 border-transparent' : 'hover:border-indigo-200'
+        ]">
         <span :class="[
           'text-sm font-medium',
           isToday ? 'text-indigo-600' : (isCurrentMonth ? 'text-slate-700' : '')
@@ -108,22 +109,29 @@ const prevMonth = () => {
         </span>
 
         <div class="mt-auto flex flex-wrap gap-1">
-          <div v-for="entry in entriesStore.getEntriesByDate(date)" :key="entry.id"
-            class="relative flex items-center justify-center">
-            <div class="cursor-[url(@/assets/cursor.cur),pointer] p-1 peer" @click.stop="openEntryDetails(entry)">
-              <div class="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-indigo-500"></div>
+          <template v-if="entriesStore.isLoading">
+            <div v-if="isCurrentMonth" class="cursor-wait p-1">
+              <div class="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-slate-200 animate-pulse"></div>
             </div>
+          </template>
+          <template v-else>
+            <div v-for="entry in entriesStore.getEntriesByDate(date)" :key="entry.id"
+              class="relative flex items-center justify-center">
+              <div class="cursor-[url(@/assets/cursor.cur),pointer] p-1 peer" @click.stop="openEntryDetails(entry)">
+                <div class="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-indigo-500"></div>
+              </div>
 
-            <!-- tooltip -->
-            <div
-              class="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden w-max max-w-50 -translate-x-1/2 rounded-lg bg-slate-500 px-3 py-2 text-xs font-medium text-white shadow-xl peer-hover:block">
-              <p class="truncate whitespace-normal line-clamp-3">
-                {{ entry.content }}
-              </p>
+              <!-- tooltip -->
+              <div
+                class="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden w-max max-w-50 -translate-x-1/2 rounded-lg bg-slate-500 px-3 py-2 text-xs font-medium text-white shadow-xl peer-hover:block">
+                <p class="truncate whitespace-normal line-clamp-3">
+                  {{ entry.content }}
+                </p>
 
-              <div class="absolute left-1/2 -bottom-1 -mt-px h-2 w-2 -translate-x-1/2 rotate-45 bg-slate-500"></div>
+                <div class="absolute left-1/2 -bottom-1 -mt-px h-2 w-2 -translate-x-1/2 rotate-45 bg-slate-500"></div>
+              </div>
             </div>
-          </div>
+          </template>
         </div>
       </div>
     </div>
