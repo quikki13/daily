@@ -85,8 +85,9 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="postcss">
-@reference "tailwindcss";
+<style>
+  @reference "tailwindcss";
+/* --- Анимация "View" --- */
 
 .view-enter-active,
 .view-leave-active {
@@ -96,7 +97,6 @@ onMounted(() => {
 .view-enter-from,
 .view-leave-to {
   @apply opacity-0 translate-y-4;
-  
   /* Растворяемся и сдвигаемся вниз на 1rem (16px) при скрытии и начинаем рисоваться с этого же положения */
 }
 
