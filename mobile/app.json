@@ -2,7 +2,6 @@
   "expo": {
     "name": "Daily",
     "slug": "daily-mobile",
-    "scheme": "daily",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/daily-icon.png",
@@ -24,9 +23,6 @@
     },
     "web": {
     },
-    "plugins": [
-      "expo-router"
-    ],
     "experiments": {
       "typedRoutes": true
     }

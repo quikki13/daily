@@ -11,6 +11,14 @@
     "dist",
     "web-build"
   ],
+  "paths": {
+    "@/*": [
+      "./src/*"
+    ],
+    "@/consts": [
+      "./src/consts"
+    ]
+  },
   "include": [
     "**/*.ts",
     "**/*.tsx",
