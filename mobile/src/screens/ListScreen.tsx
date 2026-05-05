@@ -1,6 +1,14 @@
 import { useEffect } from "react";
-import { Text, View, FlatList, ActivityIndicator } from "react-native";
+import {
+  Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import { Bug, Info } from "lucide-react-native";
+import { useNavigation } from "@react-navigation/native";
+import { Plus } from "lucide-react-native";
 
 import { formatDate } from "../utils/calendar";
 
@@ -8,6 +16,8 @@ import { useEntriesStore } from "../store/useEntriesStore";
 
 export default function ListScreen() {
   const { entries, isLoading, error, fetchEntries } = useEntriesStore();
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchEntries();
@@ -59,6 +69,19 @@ export default function ListScreen() {
           </View>
         }
       />
+      <TouchableOpacity
+        className="absolute bottom-6 right-6 w-14 h-14 bg-indigo-600 rounded-full items-center justify-center"
+        style={{
+          backgroundColor: "#6366f1",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.75,
+          shadowRadius: 2,
+          opacity: 1,
+        }}
+        onPress={() => navigation.navigate("CreateEntry" as never)}
+      >
+        <Plus color="white" size={28} />
+      </TouchableOpacity>
     </View>
   );
 }

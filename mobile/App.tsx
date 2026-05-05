@@ -2,13 +2,16 @@ import "./src/global.css";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Calendar, List } from "lucide-react-native";
 
 // --- Импорты экранов ---
 import ListScreen from "./src/screens/ListScreen";
 import CalendarScreen from "./src/screens/CalendarScreen";
+import CreateEntryScreen from "./src/screens/CreateEntryScreen";
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 // --- Компонент навигации (вынесли отдельно для чистоты) ---
 function BottomTabsNavigator() {
@@ -51,7 +54,24 @@ function BottomTabsNavigator() {
 export default function App() {
   return (
     <NavigationContainer>
-      <BottomTabsNavigator />
+      <Stack.Navigator>
+        <Stack.Screen
+          name="MainTabs"
+          component={BottomTabsNavigator}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="CreateEntry"
+          component={CreateEntryScreen}
+          options={{
+            presentation: "modal", // Магия нативного слайда снизу вверх!
+            title: "Новая запись",
+            headerStyle: { backgroundColor: "#f8fafc" },
+            headerShadowVisible: false,
+          }}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
