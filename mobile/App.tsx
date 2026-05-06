@@ -1,4 +1,4 @@
-import "./src/global.css";
+import "@/global.css";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -6,9 +6,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Calendar, List } from "lucide-react-native";
 
 // --- Импорты экранов ---
-import ListScreen from "./src/screens/ListScreen";
-import CalendarScreen from "./src/screens/CalendarScreen";
-import CreateEntryScreen from "./src/screens/CreateEntryScreen";
+import ListScreen from "@/screens/ListScreen";
+import CalendarScreen from "@/screens/CalendarScreen";
+import CreateEntryScreen from "@/screens/CreateEntryScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

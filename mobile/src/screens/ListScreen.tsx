@@ -10,9 +10,9 @@ import { Bug, Info } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Plus } from "lucide-react-native";
 
-import { formatDate } from "../utils/calendar";
+import { formatDate } from "@/utils/calendar";
 
-import { useEntriesStore } from "../store/useEntriesStore";
+import { useEntriesStore } from "@/store/useEntriesStore";
 
 export default function ListScreen() {
   const { entries, isLoading, error, fetchEntries } = useEntriesStore();

@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Text, View, TouchableOpacity } from "react-native";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 
-import { weekDays } from "../consts/common";
+import { weekDays } from "@/consts/common";
 
 export default function CalendarScreen() {
 

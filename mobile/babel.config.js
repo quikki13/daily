@@ -8,6 +8,16 @@ module.exports = function (api) {
     plugins: [
       "react-native-reanimated/plugin",
       "@babel/plugin-transform-export-namespace-from",
+      [
+        "module-resolver",
+        {
+          root: ["./"],
+          alias: {
+            "@": "./src",
+          },
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
+      ],
     ],
   }
 }

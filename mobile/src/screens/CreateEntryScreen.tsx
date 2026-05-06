@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { formatDate } from "../utils/calendar";
-import { useEntriesStore } from '../store/useEntriesStore';
+import { formatDate } from "@/utils/calendar";
+import { useEntriesStore } from '@/store/useEntriesStore';
 
 export default function CreateEntryScreen() {
   const [content, setContent] = useState('');
