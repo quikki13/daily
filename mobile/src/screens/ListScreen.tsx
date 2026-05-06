@@ -55,6 +55,24 @@ export default function ListScreen() {
             >
               {item.content}
             </Text>
+
+            {Boolean(item && item?.tags && item.tags.length > 0) && (
+              <View className="flex-row flex-wrap gap-2 mt-3">
+                {item.tags.map((tag, i) => (
+                  <View
+                    key={i}
+                    className={`px-2.5 py-1 rounded-md bg-slate-100`}
+                  >
+                    {tag && (
+                      <Text className="text-slate-600 text-xs font-medium">
+                        #{tag.name}
+                      </Text>
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
+
             <Text className="text-sm font-medium text-slate-400 mt-2">
               {formatDate(item.date)}
             </Text>

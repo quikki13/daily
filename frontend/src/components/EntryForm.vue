@@ -2,8 +2,6 @@
 import { ref, watch } from 'vue';
 import { X, Tag as TagIcon, Calendar as CalendarIcon } from 'lucide-vue-next';
 
-import { formatDateForApi } from '@/utils/calendar';
-
 import { type Entry } from '@/stores/entries';
 import api from '@/api';
 

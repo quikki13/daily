@@ -1,11 +1,19 @@
 import { create } from "zustand";
 
 import { api } from "@/api";
+import { getUUID } from "@/utils/common";
 
 export interface Entry {
   content: string;
   date: string;
+  tags: Tag[];
   id: string | number;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  color?: string;
 }
 
 interface EntryState {
@@ -34,14 +42,23 @@ export const useEntriesStore = create<EntryState>((set) => ({
     }
   },
 
-  addEntry: async (content: string, date: string) => {
+  addEntry: async (content: string, date: string, tags: string[] = []) => {
     set({ isLoading: true, error: null });
     try {
-      await api.post("/entries", { content, date, tags: [] });
+      await api.post("/entries", { content, date, tags });
+
+      const updTags = tags.map((tag) => {
+        return { name: tag, id: getUUID() };
+      });
       set((state) => ({
         entries: [
           ...state.entries,
-          { content, date, id: Math.floor(Math.random() * 10000), tags: [] },
+          {
+            content,
+            date,
+            id: Math.floor(Math.random() * 10000),
+            tags: updTags,
+          },
         ],
       }));
       return true; // если успешно добавили запись
