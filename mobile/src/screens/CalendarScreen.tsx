@@ -1,12 +1,20 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Text, View, TouchableOpacity } from "react-native";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
-
+import { useEntriesStore } from "@/store/useEntriesStore";
 import { weekDays } from "@/consts/common";
+import { formatDate } from "@/utils/calendar";
 
 export default function CalendarScreen() {
-
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  const { entries, isInited, fetchEntries } = useEntriesStore();
+
+  useEffect(() => {
+    if (!isInited) {
+      fetchEntries();
+    }
+  }, []);
 
   const calendarDays = useMemo(() => {
     const year = currentDate.getFullYear();
@@ -42,7 +50,6 @@ export default function CalendarScreen() {
     return days;
   }, [currentDate]);
 
-  // Обработчики кнопок
   const nextMonth = () =>
     setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1),
@@ -54,7 +61,6 @@ export default function CalendarScreen() {
 
   return (
     <View className="flex-1 bg-slate-50 p-4">
-      {/* 1. Шапка календаря с навигацией */}
       <View className="flex-row items-center justify-between mb-6 mt-4">
         <TouchableOpacity
           onPress={prevMonth}
@@ -92,7 +98,6 @@ export default function CalendarScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Дни недели */}
       <View className="flex-row mb-2">
         {weekDays.map((day, index) => (
           <View key={index} className="flex-1 items-center">
@@ -101,24 +106,20 @@ export default function CalendarScreen() {
         ))}
       </View>
 
-      {/* Сетка дней */}
       <View className="flex-row flex-wrap">
         {calendarDays.map((item, index) => {
           const isToday =
             new Date().toDateString() === item.date.toDateString();
 
+          const dateString = formatDate(item.date);
+          const dayEntries = entries.filter(
+            (entry) => formatDate(entry.date) === dateString,
+          );
+
           return (
             <View key={index} className="w-[14.28%] p-1">
               <TouchableOpacity
                 activeOpacity={0.7}
-                style={{
-                  backgroundColor: item.isCurrentMonth
-                    ? "rgba(148,163,184, 0.1)"
-                    : "rgba(148,163,184, 0.03)",
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 2,
-                }}
                 className={`h-14 w-full items-center justify-center rounded-2xl border ${
                   item.isCurrentMonth
                     ? "bg-white border-slate-100"
@@ -133,8 +134,21 @@ export default function CalendarScreen() {
                   {item.day}
                 </Text>
 
-                <View className="mt-1 flex-row gap-0.5">
-                  <View className="h-1.5 w-1.5 rounded-full bg-transparent" />
+                <View className="mt-1 flex-row justify-center align-baseline gap-1">
+                  {dayEntries.length ? (
+                    <View
+                      className={`h-4 w-9 mt-1 rounded-full ${
+                        item.isCurrentMonth ? "bg-indigo-500" : "bg-indigo-300"
+                      }`}
+                    >
+                      <Text className="text-xs text-indigo-50 text-center">
+                        {dayEntries.length > 100 ? "100+" : dayEntries.length}
+                      </Text>
+                    </View>
+                  ) : (
+                    // заглушка
+                    <View className="h-4 w-9 rounded-full bg-transparent" />
+                  )}
                 </View>
               </TouchableOpacity>
             </View>
