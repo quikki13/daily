@@ -1,21 +1,50 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Text,
   View,
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  Modal,
 } from "react-native";
-import { Bug, Info } from "lucide-react-native";
+import { Bug, Info, ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Plus } from "lucide-react-native";
+import { Plus, Calendar as CalendarIcon, X } from "lucide-react-native";
+
+import { weekDays } from "@/consts/common";
 
 import { formatDate } from "@/utils/calendar";
+import { filterEntriesByDate } from "@/utils/filters";
+
+import { useCalendar, type CalendarDay } from "@/hooks/useCalendar";
 
 import { useEntriesStore } from "@/store/useEntriesStore";
 
 export default function ListScreen() {
-  const { entries, isLoading, error, fetchEntries } = useEntriesStore();
+  const {
+    entries,
+    isLoading,
+    selectedDate,
+    error,
+    setSelectedDate,
+    fetchEntries,
+  } = useEntriesStore();
+
+  const [isCalendarModalVisible, setCalendarModalVisible] = useState(false);
+
+  const { calendarDays, currentDate, nextMonth, prevMonth } = useCalendar();
+
+  const filteredEntries = useMemo(() => {
+    if (!selectedDate) {
+      return entries;
+    }
+    return filterEntriesByDate(entries, selectedDate);
+  }, [entries, selectedDate]);
+
+  const onDayInModalClick = ({ date }: CalendarDay) => {
+    setSelectedDate(formatDate(date));
+    setCalendarModalVisible(false);
+  };
 
   const navigation = useNavigation();
 
@@ -42,12 +71,44 @@ export default function ListScreen() {
 
   return (
     <View className="flex-1 bg-slate-50">
+      <View className="flex-row justify-between items-center px-5 pt-5 pb-2">
+        <Text className="text-2xl font-bold text-slate-800">Записи</Text>
+
+        <TouchableOpacity
+          className={`flex-row items-center px-3 py-1.5 rounded-full border ${
+            selectedDate
+              ? "bg-indigo-100 border-indigo-200"
+              : "bg-white border-slate-200"
+          }`}
+          onPress={() => setCalendarModalVisible(true)}
+        >
+          <CalendarIcon
+            size={16}
+            color={selectedDate ? "#4338ca" : "#64748b"}
+          />
+          <Text
+            className={`ml-2 font-medium ${selectedDate ? "text-indigo-700" : "text-slate-500"}`}
+          >
+            {selectedDate ? selectedDate : "Все даты"}
+          </Text>
+
+          {selectedDate && (
+            <TouchableOpacity
+              className="ml-2"
+              onPress={() => setSelectedDate(null)}
+            >
+              <X size={14} color="#4338ca" />
+            </TouchableOpacity>
+          )}
+        </TouchableOpacity>
+      </View>
+
       <FlatList
-        data={entries}
+        data={filteredEntries}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ padding: 20, gap: 12 }}
         renderItem={({ item }) => (
-          <View className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+          <View className="bg-white p-4 rounded-xl border border-slate-100">
             {/* Ограничиваем content до 3 строк (numberOfLines={3}) */}
             <Text
               className="text-base text-slate-800 leading-relaxed"
@@ -100,6 +161,92 @@ export default function ListScreen() {
       >
         <Plus color="white" size={28} />
       </TouchableOpacity>
+
+      <Modal
+        visible={isCalendarModalVisible}
+        animationType="slide"
+        transparent={true} // Позволяет сделать фон полупрозрачным
+        onRequestClose={() => setCalendarModalVisible(false)} // Обязательно для Android (кнопка "Назад")
+      >
+        <View className="flex-1 justify-end bg-black/30">
+          <View className="bg-white rounded-t-3xl p-5 min-h-[50%]">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-lg font-bold text-slate-800">
+                Выберите дату
+              </Text>
+              <TouchableOpacity onPress={() => setCalendarModalVisible(false)}>
+                <X size={24} color="#64748b" />
+              </TouchableOpacity>
+            </View>
+
+            {/* шапка календаря */}
+
+            <View className="flex-row items-center justify-between mb-4">
+              <TouchableOpacity
+                onPress={prevMonth}
+                className="p-2 bg-slate-50 rounded-full"
+              >
+                <ChevronLeft color="#475569" size={20} />
+              </TouchableOpacity>
+              <Text className="text-lg font-semibold text-slate-700 capitalize">
+                {currentDate.toLocaleString("ru-RU", {
+                  month: "long",
+                  year: "numeric",
+                })}
+              </Text>
+              <TouchableOpacity
+                onPress={nextMonth}
+                className="p-2 bg-slate-50 rounded-full"
+              >
+                <ChevronRight color="#475569" size={20} />
+              </TouchableOpacity>
+            </View>
+
+            {/* дни недели */}
+            <View className="flex-row mb-2">
+              {weekDays.map((day, index) => (
+                <View key={index} className="flex-1 items-center">
+                  <Text className="text-xs font-semibold text-slate-400">
+                    {day}
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            {/* сетка дней */}
+            <View className="flex-row flex-wrap">
+              {calendarDays.map((item, index) => {
+                // Проверяем, выбрана ли именно эта дата в фильтре
+                const isSelected = selectedDate === formatDate(item.date);
+
+                return (
+                  <View key={index} className="w-[14.28%] p-1">
+                    <TouchableOpacity
+                      onPress={() => onDayInModalClick(item)}
+                      activeOpacity={0.7}
+                      className={`h-10 w-full items-center justify-center rounded-xl ${
+                        isSelected ? "bg-indigo-600" : "bg-transparent"
+                      }`}
+                    >
+                      <Text
+                        className={`text-[15px] font-medium ${
+                          isSelected
+                            ? "text-white"
+                            : item.isCurrentMonth
+                              ? "text-slate-700"
+                              : "text-slate-300"
+                        }`}
+                      >
+                        {item.day}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

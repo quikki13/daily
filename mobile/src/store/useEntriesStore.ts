@@ -19,14 +19,19 @@ export interface Tag {
 interface EntryState {
   entries: Entry[];
   isLoading: boolean;
+  isInited: boolean;
+  selectedDate: string | null;
   error: string | null;
   fetchEntries: () => Promise<void>;
   addEntry: (content: string, date: string, tags: string[]) => Promise<boolean>;
+  setSelectedDate: (date: string | null) => void;
 }
 
 export const useEntriesStore = create<EntryState>((set) => ({
   entries: [],
   isLoading: false,
+  isInited: false,
+  selectedDate: null, // для фильтра по дням - по умолчанию выключен
   error: "",
 
   fetchEntries: async () => {
@@ -38,11 +43,11 @@ export const useEntriesStore = create<EntryState>((set) => ({
       console.error("Ошибка загрузки:", e.message);
       set({ error: "Ошибка загрузки записей" });
     } finally {
-      set((state) => ({ isLoading: !state.isLoading }));
+      set((state) => ({ isLoading: !state.isLoading, isInited: true }));
     }
   },
 
-  addEntry: async (content: string, date: string, tags: string[] = []) => {
+  addEntry: async (content, date, tags = []) => {
     set({ isLoading: true, error: null });
     try {
       await api.post("/entries", { content, date, tags });
@@ -70,4 +75,6 @@ export const useEntriesStore = create<EntryState>((set) => ({
       set({ isLoading: false });
     }
   },
+
+  setSelectedDate: (date) => set({selectedDate: date})
 }));

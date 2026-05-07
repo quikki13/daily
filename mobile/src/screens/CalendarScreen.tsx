@@ -5,59 +5,58 @@ import { useEntriesStore } from "@/store/useEntriesStore";
 import { weekDays } from "@/consts/common";
 import { formatDate } from "@/utils/calendar";
 
-export default function CalendarScreen() {
-  const [currentDate, setCurrentDate] = useState(new Date());
+import { useCalendar } from "@/hooks/useCalendar";
 
+export default function CalendarScreen() {
   const { entries, isInited, fetchEntries } = useEntriesStore();
+  const { currentDate, calendarDays, nextMonth, prevMonth  } = useCalendar();
 
   useEffect(() => {
     if (!isInited) {
       fetchEntries();
     }
   }, []);
+  //   const year = currentDate.getFullYear();
+  //   const month = currentDate.getMonth();
 
-  const calendarDays = useMemo(() => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+  //   const firstDayOfMonth = new Date(year, month, 1).getDay();
+  //   // Воскресенье = 0. Сдвигаем, чтобы понедельник был 1, воскресенье 7
+  //   const startingDay = firstDayOfMonth === 0 ? 7 : firstDayOfMonth;
 
-    const firstDayOfMonth = new Date(year, month, 1).getDay();
-    // Воскресенье = 0. Сдвигаем, чтобы понедельник был 1, воскресенье 7
-    const startingDay = firstDayOfMonth === 0 ? 7 : firstDayOfMonth;
+  //   const daysInMonth = new Date(year, month + 1, 0).getDate();
+  //   const daysInPrevMonth = new Date(year, month, 0).getDate();
 
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const daysInPrevMonth = new Date(year, month, 0).getDate();
+  //   const days = [];
 
-    const days = [];
+  //   // Хвост предыдущего месяца
+  //   for (let i = 1; i < startingDay; i++) {
+  //     days.push({
+  //       day: daysInPrevMonth - startingDay + i + 1,
+  //       isCurrentMonth: false,
+  //       date: new Date(year, month - 1, daysInPrevMonth - startingDay + i + 1),
+  //     });
+  //   }
 
-    // Хвост предыдущего месяца
-    for (let i = 1; i < startingDay; i++) {
-      days.push({
-        day: daysInPrevMonth - startingDay + i + 1,
-        isCurrentMonth: false,
-        date: new Date(year, month - 1, daysInPrevMonth - startingDay + i + 1),
-      });
-    }
+  //   // Дни текущего месяца
+  //   for (let i = 1; i <= daysInMonth; i++) {
+  //     days.push({
+  //       day: i,
+  //       isCurrentMonth: true,
+  //       date: new Date(year, month, i),
+  //     });
+  //   }
 
-    // Дни текущего месяца
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push({
-        day: i,
-        isCurrentMonth: true,
-        date: new Date(year, month, i),
-      });
-    }
+  //   return days;
+  // }, [currentDate]);
 
-    return days;
-  }, [currentDate]);
-
-  const nextMonth = () =>
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1),
-    );
-  const prevMonth = () =>
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
-    );
+  // const nextMonth = () =>
+  //   setCurrentDate(
+  //     new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1),
+  //   );
+  // const prevMonth = () =>
+  //   setCurrentDate(
+  //     new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
+  //   );
 
   return (
     <View className="flex-1 bg-slate-50 p-4">
