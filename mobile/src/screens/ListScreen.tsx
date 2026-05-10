@@ -3,13 +3,20 @@ import {
   Text,
   View,
   FlatList,
+  Alert,
   ActivityIndicator,
   TouchableOpacity,
   Modal,
 } from "react-native";
 import { Bug, Info, ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Plus, Calendar as CalendarIcon, X, Pencil } from "lucide-react-native";
+import {
+  Plus,
+  Calendar as CalendarIcon,
+  X,
+  Pencil,
+  Trash2,
+} from "lucide-react-native";
 
 import { weekDays } from "@/consts/common";
 
@@ -18,7 +25,7 @@ import { filterEntriesByDate } from "@/utils/filters";
 
 import { useCalendar, type CalendarDay } from "@/hooks/useCalendar";
 
-import { useEntriesStore } from "@/store/useEntriesStore";
+import { Entry, useEntriesStore } from "@/store/useEntriesStore";
 
 export default function ListScreen() {
   const {
@@ -27,6 +34,7 @@ export default function ListScreen() {
     selectedDate,
     error,
     setSelectedDate,
+    deleteEntry,
     fetchEntries,
   } = useEntriesStore();
 
@@ -40,6 +48,21 @@ export default function ListScreen() {
     }
     return filterEntriesByDate(entries, selectedDate);
   }, [entries, selectedDate]);
+
+  const showConfirm = (item: Entry) => {
+    Alert.alert(
+      `Удаление записи за ${formatDate(item.date)}`,
+      "Уверены, что хотите удалить запись? 🥺",
+      [
+        { text: "Отмена", style: "cancel" },
+        {
+          text: "Удалить",
+          style: "destructive",
+          onPress: () => deleteEntry(item.id),
+        },
+      ],
+    );
+  };
 
   const onDayInModalClick = ({ date }: CalendarDay) => {
     setSelectedDate(formatDate(date));
@@ -139,23 +162,29 @@ export default function ListScreen() {
                 {formatDate(item.date)}
               </Text>
 
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate(
-                    ...([
-                      "EditEntry",
-                      {
-                        entry: {
-                          ...item,
-                          tags: item.tags.map(({ name }) => name),
+              <View className="flex flex-row gap-3">
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate(
+                      ...([
+                        "EditEntry",
+                        {
+                          entry: {
+                            ...item,
+                            tags: item.tags.map(({ name }) => name),
+                          },
                         },
-                      },
-                    ] as never),
-                  )
-                }
-              >
-                <Pencil size={14} color="#94a3b8" />
-              </TouchableOpacity>
+                      ] as never),
+                    )
+                  }
+                >
+                  <Pencil size={18} color="#94a3b8" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => showConfirm(item)}>
+                  <Trash2 size={18} color="#f87171" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         )}

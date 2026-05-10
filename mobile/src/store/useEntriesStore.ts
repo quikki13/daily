@@ -23,6 +23,7 @@ interface EntryState {
   selectedDate: string | null;
   error: string | null;
   fetchEntries: () => Promise<void>;
+  deleteEntry: (id: number | string) => Promise<boolean>; 
   updateEntry: (id: string, updatedData: IUpdatedData) => Promise<boolean>;
   addEntry: (content: string, date: string, tags: string[]) => Promise<boolean>;
   setSelectedDate: (date: string | null) => void;
@@ -57,12 +58,9 @@ export const useEntriesStore = create<EntryState>((set) => ({
   updateEntry: async (id, updatedData) => {
     set({ isLoading: true, error: null });
     try {
-      await api.put(
-        `/entries/${id}`,
-        updatedData,
-      );
+      await api.put(`/entries/${id}`, updatedData);
 
-      const response = await api.get('/entries');
+      const response = await api.get("/entries");
       set({ entries: response.data, isLoading: false });
 
       return true; // success
@@ -97,6 +95,24 @@ export const useEntriesStore = create<EntryState>((set) => ({
       console.error("Ошибка добавления записи:", e.message);
       set({ error: "Ошибка добавления записи" });
       return false; // если ошибка добавления записи
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  deleteEntry: async (id: string | number) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(`/entries/${id}`);
+
+      set((state) => ({
+        entries: state.entries.filter((entry) => entry.id !== id),
+      }));
+      return true; // запись удалена успешно
+    } catch (e: any) {
+      console.error("Ошибка удаления записи:", e.message);
+      set({ error: "Ошибка удаления записи" });
+      return false; // еошибка удаления
     } finally {
       set({ isLoading: false });
     }

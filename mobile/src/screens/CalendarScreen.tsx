@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Text, View, TouchableOpacity } from "react-native";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useEntriesStore } from "@/store/useEntriesStore";
