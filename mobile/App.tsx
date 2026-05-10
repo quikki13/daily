@@ -1,5 +1,6 @@
 import "@/global.css";
 import React from "react";
+import { Platform, UIManager } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -53,6 +54,15 @@ function BottomTabsNavigator() {
 
 // --- Главная точка входа ---
 export default function App() {
+
+  // анимашки на андроиде, на ios из коробки работает
+  if (
+    Platform.OS === "android" &&
+    UIManager.setLayoutAnimationEnabledExperimental
+  ) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -77,9 +87,9 @@ export default function App() {
           name="EditEntry"
           component={EditEntryScreen}
           options={{
-            presentation: 'modal', 
-            title: 'Редактировать запись',
-            headerStyle: { backgroundColor: '#f8fafc' },
+            presentation: "modal",
+            title: "Редактировать запись",
+            headerStyle: { backgroundColor: "#f8fafc" },
             headerShadowVisible: false,
           }}
         />

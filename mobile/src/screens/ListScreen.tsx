@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Modal,
+  LayoutAnimation
 } from "react-native";
 import { Bug, Info, ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -58,7 +59,8 @@ export default function ListScreen() {
         {
           text: "Удалить",
           style: "destructive",
-          onPress: () => deleteEntry(item.id),
+          onPress: async () => {
+            await deleteEntry(item.id) },
         },
       ],
     );

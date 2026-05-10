@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { LayoutAnimation } from "react-native";
 
 import { api } from "@/api";
 import { getUUID } from "@/utils/common";
@@ -23,7 +24,7 @@ interface EntryState {
   selectedDate: string | null;
   error: string | null;
   fetchEntries: () => Promise<void>;
-  deleteEntry: (id: number | string) => Promise<boolean>; 
+  deleteEntry: (id: number | string) => Promise<boolean>;
   updateEntry: (id: string, updatedData: IUpdatedData) => Promise<boolean>;
   addEntry: (content: string, date: string, tags: string[]) => Promise<boolean>;
   setSelectedDate: (date: string | null) => void;
@@ -105,9 +106,12 @@ export const useEntriesStore = create<EntryState>((set) => ({
     try {
       await api.delete(`/entries/${id}`);
 
-      set((state) => ({
-        entries: state.entries.filter((entry) => entry.id !== id),
-      }));
+      set((state) => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+        return {
+          entries: state.entries.filter((entry) => entry.id !== id),
+        };
+      });
       return true; // запись удалена успешно
     } catch (e: any) {
       console.error("Ошибка удаления записи:", e.message);
