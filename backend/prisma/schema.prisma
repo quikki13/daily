@@ -13,7 +13,7 @@ datasource db {
 }
 
 model Entry {
-  id   String  @id @default(uuid())
+  id String  @id @default(uuid())
   content String @db.Text
   date DateTime
   createdAt DateTime @default(now())

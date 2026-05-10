@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Bug, Info, ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Plus, Calendar as CalendarIcon, X } from "lucide-react-native";
+import { Plus, Calendar as CalendarIcon, X, Pencil } from "lucide-react-native";
 
 import { weekDays } from "@/consts/common";
 
@@ -134,9 +134,29 @@ export default function ListScreen() {
               </View>
             )}
 
-            <Text className="text-sm font-medium text-slate-400 mt-2">
-              {formatDate(item.date)}
-            </Text>
+            <View className="flex flex-row justify-between items-center mt-3">
+              <Text className="text-sm font-medium text-slate-400 mt-2">
+                {formatDate(item.date)}
+              </Text>
+
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate(
+                    ...([
+                      "EditEntry",
+                      {
+                        entry: {
+                          ...item,
+                          tags: item.tags.map(({ name }) => name),
+                        },
+                      },
+                    ] as never),
+                  )
+                }
+              >
+                <Pencil size={14} color="#94a3b8" />
+              </TouchableOpacity>
+            </View>
           </View>
         )}
         ListEmptyComponent={

@@ -9,6 +9,7 @@ import { Calendar, List } from "lucide-react-native";
 import ListScreen from "@/screens/ListScreen";
 import CalendarScreen from "@/screens/CalendarScreen";
 import CreateEntryScreen from "@/screens/CreateEntryScreen";
+import EditEntryScreen from "@/screens/EditEntryScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -68,6 +69,17 @@ export default function App() {
             presentation: "modal", // Магия нативного слайда снизу вверх!
             title: "Новая запись",
             headerStyle: { backgroundColor: "#f8fafc" },
+            headerShadowVisible: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="EditEntry"
+          component={EditEntryScreen}
+          options={{
+            presentation: 'modal', 
+            title: 'Редактировать запись',
+            headerStyle: { backgroundColor: '#f8fafc' },
             headerShadowVisible: false,
           }}
         />

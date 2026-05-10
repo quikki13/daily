@@ -23,8 +23,15 @@ interface EntryState {
   selectedDate: string | null;
   error: string | null;
   fetchEntries: () => Promise<void>;
+  updateEntry: (id: string, updatedData: IUpdatedData) => Promise<boolean>;
   addEntry: (content: string, date: string, tags: string[]) => Promise<boolean>;
   setSelectedDate: (date: string | null) => void;
+}
+
+interface IUpdatedData {
+  content: string;
+  date?: string; // в целом можно, но мы не будем передавать, чтобы не лоамать логику и не перебрасывать заметку между днями
+  tags: string[];
 }
 
 export const useEntriesStore = create<EntryState>((set) => ({
@@ -44,6 +51,25 @@ export const useEntriesStore = create<EntryState>((set) => ({
       set({ error: "Ошибка загрузки записей" });
     } finally {
       set((state) => ({ isLoading: !state.isLoading, isInited: true }));
+    }
+  },
+
+  updateEntry: async (id, updatedData) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.put(
+        `/entries/${id}`,
+        updatedData,
+      );
+
+      const response = await api.get('/entries');
+      set({ entries: response.data, isLoading: false });
+
+      return true; // success
+    } catch (e: any) {
+      console.error("Ошибка редактирования записи:", e.message);
+      set({ error: "Ошибка редактирования записи", isLoading: false });
+      return false; // если ошибка редактирования записи
     }
   },
 
@@ -76,5 +102,5 @@ export const useEntriesStore = create<EntryState>((set) => ({
     }
   },
 
-  setSelectedDate: (date) => set({selectedDate: date})
+  setSelectedDate: (date) => set({ selectedDate: date }),
 }));
