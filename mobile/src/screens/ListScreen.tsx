@@ -46,6 +46,7 @@ export default function ListScreen() {
     isLoading,
     selectedDate,
     error,
+    tagsIndex,
     setSelectedDate,
     deleteEntry,
     fetchEntries,
@@ -65,11 +66,11 @@ export default function ListScreen() {
     }
 
     if (searchInput.trim()) {
-      result = filterEntriesBySearch(result, searchInput, searchType);
+      result = filterEntriesBySearch(result, searchInput, searchType, tagsIndex);
     }
 
     return result;
-  }, [entries, selectedDate, searchInput, searchType]);
+  }, [entries, selectedDate, searchInput, searchType, tagsIndex]);
 
   const showConfirm = (item: Entry) => {
     Alert.alert(

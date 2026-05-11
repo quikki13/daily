@@ -25,6 +25,7 @@ export const filterEntriesBySearch = (
   arr: Entry[],
   query: string,
   type: SearchType,
+  tagsIndex?: Record<string, string[]>,
 ) => {
   const result = [];
   const trimmedQuery = query.trim();
@@ -42,12 +43,12 @@ export const filterEntriesBySearch = (
   for (const entry of arr) {
     if (type === "content" && entry.content.includes(normalizedQuery)) {
       result.push(entry);
-    } else if (
-      type === "tag" &&
-      entry.tags.length &&
-      entry.tags.some((tag) => tag.name.toLowerCase().includes(normalizedQuery))
-    ) {
-      result.push(entry);
+    } else if (type === "tag" && entry.tags.length && tagsIndex) {
+      const matchingIds = tagsIndex[normalizedQuery];
+      if (!matchingIds || matchingIds.length === 0) return [];
+      result.concat(
+        arr.filter((entry) => matchingIds.includes(entry.id.toString())),
+      );
     }
   }
 

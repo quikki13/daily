@@ -19,6 +19,7 @@ export interface Tag {
 
 interface EntryState {
   entries: Entry[];
+  tagsIndex: Record<string, string[]>;
   isLoading: boolean;
   isInited: boolean;
   selectedDate: string | null;
@@ -36,8 +37,30 @@ interface IUpdatedData {
   tags: string[];
 }
 
+const generateTagsIndex = (entries: Entry[]) => {
+  const index: Record<string, string[]> = {}; // Ключ: строка (тэг), Значение: массив ID
+
+  for (const entry of entries) {
+    if (!entry.tags || entry.tags.length === 0) continue;
+
+    for (const tag of entry.tags) {
+      const normalizedTag = tag.name.toLowerCase();
+
+      // Если такого тэга еще нет в словаре, создаем пустой массив
+      if (!index[normalizedTag]) {
+        index[normalizedTag] = [];
+      }
+      // Добавляем ID записи в массив этого тэга
+      index[normalizedTag].push(entry.id.toString());
+    }
+  }
+
+  return index;
+};
+
 export const useEntriesStore = create<EntryState>((set) => ({
   entries: [],
+  tagsIndex: {},
   isLoading: false,
   isInited: false,
   selectedDate: null, // для фильтра по дням - по умолчанию выключен
@@ -47,7 +70,10 @@ export const useEntriesStore = create<EntryState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.get("/entries");
-      set((_state) => ({ entries: response.data }));
+      set((_state) => ({
+        entries: response.data,
+        tagsIndex: generateTagsIndex(response.data),
+      }));
     } catch (e: any) {
       console.error("Ошибка загрузки:", e.message);
       set({ error: "Ошибка загрузки записей" });
@@ -62,7 +88,11 @@ export const useEntriesStore = create<EntryState>((set) => ({
       await api.put(`/entries/${id}`, updatedData);
 
       const response = await api.get("/entries");
-      set({ entries: response.data, isLoading: false });
+      set({
+        entries: response.data,
+        tagsIndex: generateTagsIndex(response.data),
+        isLoading: false,
+      });
 
       return true; // success
     } catch (e: any) {
@@ -80,8 +110,8 @@ export const useEntriesStore = create<EntryState>((set) => ({
       const updTags = tags.map((tag) => {
         return { name: tag, id: getUUID() };
       });
-      set((state) => ({
-        entries: [
+      set((state) => {
+        const updatedEntries = [
           ...state.entries,
           {
             content,
@@ -89,8 +119,13 @@ export const useEntriesStore = create<EntryState>((set) => ({
             id: Math.floor(Math.random() * 10000),
             tags: updTags,
           },
-        ],
-      }));
+        ];
+
+        return {
+          entries: updatedEntries,
+          tagsIndex: generateTagsIndex(updatedEntries),
+        };
+      });
       return true; // если успешно добавили запись
     } catch (e: any) {
       console.error("Ошибка добавления записи:", e.message);
@@ -108,8 +143,10 @@ export const useEntriesStore = create<EntryState>((set) => ({
 
       set((state) => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+        const updatedEntries = state.entries.filter((entry) => entry.id !== id);
         return {
-          entries: state.entries.filter((entry) => entry.id !== id),
+          entries: updatedEntries,
+          tagsIndex: generateTagsIndex(updatedEntries),
         };
       });
       return true; // запись удалена успешно
