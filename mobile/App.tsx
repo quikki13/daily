@@ -11,12 +11,15 @@ import ListScreen from "@/screens/ListScreen";
 import CalendarScreen from "@/screens/CalendarScreen";
 import CreateEntryScreen from "@/screens/CreateEntryScreen";
 import EditEntryScreen from "@/screens/EditEntryScreen";
+import { useEntriesStore } from "@/store/useEntriesStore";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 // --- Компонент навигации (вынесли отдельно для чистоты) ---
 function BottomTabsNavigator() {
+  const { setSelectedDate } = useEntriesStore();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -33,6 +36,11 @@ function BottomTabsNavigator() {
       <Tab.Screen
         name="Calendar"
         component={CalendarScreen}
+        listeners={{
+          tabPress: (_e) => {
+            setSelectedDate(null);
+          },
+        }}
         options={{
           title: "Календарь",
           tabBarIcon: ({ color, size }) => (
@@ -54,7 +62,6 @@ function BottomTabsNavigator() {
 
 // --- Главная точка входа ---
 export default function App() {
-
   // анимашки на андроиде, на ios из коробки работает
   if (
     Platform.OS === "android" &&

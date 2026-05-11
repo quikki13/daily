@@ -7,9 +7,16 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Modal,
+  TextInput,
 } from "react-native";
-import { Bug, Info, ChevronLeft, ChevronRight } from "lucide-react-native";
-import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import {
+  Bug,
+  Info,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+} from "lucide-react-native";
+import { useNavigation } from "@react-navigation/native";
 import {
   Plus,
   Calendar as CalendarIcon,
@@ -21,7 +28,11 @@ import {
 import { weekDays } from "@/consts/common";
 
 import { formatDate } from "@/utils/calendar";
-import { filterEntriesByDate } from "@/utils/filters";
+import {
+  filterEntriesByDate,
+  filterEntriesBySearch,
+  SearchType,
+} from "@/utils/filters";
 
 import { useCalendar, type CalendarDay } from "@/hooks/useCalendar";
 
@@ -41,15 +52,24 @@ export default function ListScreen() {
   } = useEntriesStore();
 
   const [isCalendarModalVisible, setCalendarModalVisible] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchType, setSearchType] = useState<SearchType>("content");
 
   const { calendarDays, currentDate, nextMonth, prevMonth } = useCalendar();
 
   const filteredEntries = useMemo(() => {
-    if (!selectedDate) {
-      return entries;
+    let result = entries;
+
+    if (selectedDate) {
+      result = filterEntriesByDate(result, selectedDate);
     }
-    return filterEntriesByDate(entries, selectedDate);
-  }, [entries, selectedDate]);
+
+    if (searchInput.trim()) {
+      result = filterEntriesBySearch(result, searchInput, searchType);
+    }
+
+    return result;
+  }, [entries, selectedDate, searchInput, searchType]);
 
   const showConfirm = (item: Entry) => {
     Alert.alert(
@@ -128,6 +148,68 @@ export default function ListScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Filter */}
+
+      <View className="px-5 pb-4">
+        {/* Инпут поиска */}
+        <View className="flex-row items-center bg-white rounded-xl border border-slate-200 px-3 h-11 mb-3">
+          <Search size={18} color="#94a3b8" />
+          <TextInput
+            className="flex-1 ml-2 text-base text-slate-800"
+            placeholder="Найти записи..."
+            placeholderTextColor="#94a3b8"
+            value={searchInput}
+            onChangeText={setSearchInput}
+            autoCorrect={false}
+          />
+          {/* Кнопка очистки появляется только если есть текст */}
+          {searchInput.length > 0 && (
+            <TouchableOpacity
+              onPress={() => setSearchInput("")}
+              className="p-1"
+            >
+              <X size={16} color="#94a3b8" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Segmented Control */}
+        <View className="flex-row bg-slate-200 p-1 rounded-lg">
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => setSearchType("content")}
+            className={`flex-1 py-1.5 items-center rounded-md ${
+              searchType === "content" ? "bg-white" : "bg-transparent"
+            }`}
+          >
+            <Text
+              className={`font-medium ${
+                searchType === "content" ? "text-slate-800" : "text-slate-500"
+              }`}
+            >
+              В тексте
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => setSearchType("tag")}
+            className={`flex-1 py-1.5 items-center rounded-md ${
+              searchType === "tag" ? "bg-white" : "bg-transparent"
+            }`}
+          >
+            <Text
+              className={`font-medium ${
+                searchType === "tag" ? "text-slate-800" : "text-slate-500"
+              }`}
+            >
+              В тэгах
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* List */}
       <FlatList
         data={filteredEntries}
         keyExtractor={(item) => item.id.toString()}
