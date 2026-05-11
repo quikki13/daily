@@ -7,10 +7,9 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Modal,
-  LayoutAnimation
 } from "react-native";
 import { Bug, Info, ChevronLeft, ChevronRight } from "lucide-react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import {
   Plus,
   Calendar as CalendarIcon,
@@ -29,6 +28,8 @@ import { useCalendar, type CalendarDay } from "@/hooks/useCalendar";
 import { Entry, useEntriesStore } from "@/store/useEntriesStore";
 
 export default function ListScreen() {
+  const navigation = useNavigation();
+
   const {
     entries,
     isLoading,
@@ -60,7 +61,8 @@ export default function ListScreen() {
           text: "Удалить",
           style: "destructive",
           onPress: async () => {
-            await deleteEntry(item.id) },
+            await deleteEntry(item.id);
+          },
         },
       ],
     );
@@ -70,8 +72,6 @@ export default function ListScreen() {
     setSelectedDate(formatDate(date));
     setCalendarModalVisible(false);
   };
-
-  const navigation = useNavigation();
 
   useEffect(() => {
     fetchEntries();

@@ -1,62 +1,32 @@
 import React, { useEffect } from "react";
 import { Text, View, TouchableOpacity } from "react-native";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
-import { useEntriesStore } from "@/store/useEntriesStore";
+import { useNavigation } from "@react-navigation/native";
+
+import { Entry, useEntriesStore } from "@/store/useEntriesStore";
 import { weekDays } from "@/consts/common";
 import { formatDate } from "@/utils/calendar";
 
 import { useCalendar } from "@/hooks/useCalendar";
 
 export default function CalendarScreen() {
-  const { entries, isInited, fetchEntries } = useEntriesStore();
-  const { currentDate, calendarDays, nextMonth, prevMonth  } = useCalendar();
+  const navigation = useNavigation();
+
+  const { entries, isInited, fetchEntries, setSelectedDate } =
+    useEntriesStore();
+  const { currentDate, calendarDays, nextMonth, prevMonth } = useCalendar();
 
   useEffect(() => {
     if (!isInited) {
       fetchEntries();
     }
   }, []);
-  //   const year = currentDate.getFullYear();
-  //   const month = currentDate.getMonth();
 
-  //   const firstDayOfMonth = new Date(year, month, 1).getDay();
-  //   // Воскресенье = 0. Сдвигаем, чтобы понедельник был 1, воскресенье 7
-  //   const startingDay = firstDayOfMonth === 0 ? 7 : firstDayOfMonth;
+  const onPressDay = (date: string) => {
+    setSelectedDate(date);
 
-  //   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  //   const daysInPrevMonth = new Date(year, month, 0).getDate();
-
-  //   const days = [];
-
-  //   // Хвост предыдущего месяца
-  //   for (let i = 1; i < startingDay; i++) {
-  //     days.push({
-  //       day: daysInPrevMonth - startingDay + i + 1,
-  //       isCurrentMonth: false,
-  //       date: new Date(year, month - 1, daysInPrevMonth - startingDay + i + 1),
-  //     });
-  //   }
-
-  //   // Дни текущего месяца
-  //   for (let i = 1; i <= daysInMonth; i++) {
-  //     days.push({
-  //       day: i,
-  //       isCurrentMonth: true,
-  //       date: new Date(year, month, i),
-  //     });
-  //   }
-
-  //   return days;
-  // }, [currentDate]);
-
-  // const nextMonth = () =>
-  //   setCurrentDate(
-  //     new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1),
-  //   );
-  // const prevMonth = () =>
-  //   setCurrentDate(
-  //     new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
-  //   );
+    navigation.navigate("List" as never);
+  };
 
   return (
     <View className="flex-1 bg-slate-50 p-4">
@@ -112,13 +82,14 @@ export default function CalendarScreen() {
 
           const dateString = formatDate(item.date);
           const dayEntries = entries.filter(
-            (entry) => formatDate(entry.date) === dateString,
+            (entry: Entry) => formatDate(entry.date) === dateString,
           );
 
           return (
             <View key={index} className="w-[14.28%] p-1">
               <TouchableOpacity
                 activeOpacity={0.7}
+                onPress={() => onPressDay(dateString)}
                 className={`h-14 w-full items-center justify-center rounded-2xl border ${
                   item.isCurrentMonth
                     ? "bg-white border-slate-100"
