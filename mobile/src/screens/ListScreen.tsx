@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
+  CloudOff,
 } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -66,7 +67,12 @@ export default function ListScreen() {
     }
 
     if (searchInput.trim()) {
-      result = filterEntriesBySearch(result, searchInput, searchType, tagsIndex);
+      result = filterEntriesBySearch(
+        result,
+        searchInput,
+        searchType,
+        tagsIndex,
+      );
     }
 
     return result;
@@ -215,64 +221,74 @@ export default function ListScreen() {
         data={filteredEntries}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ padding: 20, gap: 12 }}
-        renderItem={({ item }) => (
-          <View className="bg-white p-4 rounded-xl border border-slate-100">
-            {/* Ограничиваем content до 3 строк (numberOfLines={3}) */}
-            <Text
-              className="text-base text-slate-800 leading-relaxed"
-              numberOfLines={3}
-            >
-              {item.content}
-            </Text>
+        renderItem={({ item }) => {
+          const isOffline = item.id.toString().startsWith("temp-id:");
 
-            {Boolean(item && item?.tags && item.tags.length > 0) && (
-              <View className="flex-row flex-wrap gap-2 mt-3">
-                {item.tags.map((tag, i) => (
-                  <View
-                    key={i}
-                    className={`px-2.5 py-1 rounded-md bg-slate-100`}
-                  >
-                    {tag && (
-                      <Text className="text-slate-600 text-xs font-medium">
-                        #{tag.name}
-                      </Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            <View className="flex flex-row justify-between items-center mt-3">
-              <Text className="text-sm font-medium text-slate-400 mt-2">
-                {formatDate(item.date)}
+          return (
+            <View className="bg-white p-4 rounded-xl border border-slate-100">
+              {/* Ограничиваем content до 3 строк (numberOfLines={3}) */}
+              {isOffline && (
+                <View className="flex flex-row gap-1 bg-red-300 py-1 px-1.5 items-center rounded-md mb-2 w-20">
+                  <CloudOff size={14} color="#fef2f2" />
+                  <Text className="text-sm text-red-50">Offline</Text>
+                </View>
+              )}
+              <Text
+                className="text-base text-slate-800 leading-relaxed"
+                numberOfLines={3}
+              >
+                {item.content}
               </Text>
 
-              <View className="flex flex-row gap-3">
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate(
-                      ...([
-                        "EditEntry",
-                        {
-                          entry: {
-                            ...item,
-                            tags: item.tags.map(({ name }) => name),
-                          },
-                        },
-                      ] as never),
-                    )
-                  }
-                >
-                  <Pencil size={18} color="#94a3b8" />
-                </TouchableOpacity>
+              {Boolean(item && item?.tags && item.tags.length > 0) && (
+                <View className="flex-row flex-wrap gap-2 mt-3">
+                  {item.tags.map((tag, i) => (
+                    <View
+                      key={i}
+                      className={`px-2.5 py-1 rounded-md bg-slate-100`}
+                    >
+                      {tag && (
+                        <Text className="text-slate-600 text-xs font-medium">
+                          #{tag.name}
+                        </Text>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              )}
 
-                <TouchableOpacity onPress={() => showConfirm(item)}>
-                  <Trash2 size={18} color="#f87171" />
-                </TouchableOpacity>
+              <View className="flex flex-row justify-between items-center mt-3">
+                <Text className="text-sm font-medium text-slate-400 mt-2">
+                  {formatDate(item.date)}
+                </Text>
+
+                <View className="flex flex-row gap-3">
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate(
+                        ...([
+                          "EditEntry",
+                          {
+                            entry: {
+                              ...item,
+                              tags: item.tags.map(({ name }) => name),
+                            },
+                          },
+                        ] as never),
+                      )
+                    }
+                  >
+                    <Pencil size={18} color="#94a3b8" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity onPress={() => showConfirm(item)}>
+                    <Trash2 size={18} color="#f87171" />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        )}
+          );
+        }}
         ListEmptyComponent={
           <View className="flex flex-row gap-2 justify-center items-center mt-10">
             <Info size={30} color="#94a3b8" />

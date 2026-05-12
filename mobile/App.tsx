@@ -1,9 +1,10 @@
 import "@/global.css";
-import React from "react";
+import React, { useEffect } from "react";
 import { Platform, UIManager } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { addEventListener } from "@react-native-community/netinfo";
 import { Calendar, List } from "lucide-react-native";
 
 // --- Импорты экранов ---
@@ -18,7 +19,21 @@ const Stack = createNativeStackNavigator();
 
 // --- Компонент навигации (вынесли отдельно для чистоты) ---
 function BottomTabsNavigator() {
-  const { setSelectedDate } = useEntriesStore();
+  const { setSelectedDate, setIsOnline, syncOfflineMutations } = useEntriesStore();
+
+  useEffect(() => {
+    const unsubscribe = addEventListener(state => {
+      const online = state.isConnected ?? false; 
+      
+      setIsOnline(online);
+
+      if (online) {
+        syncOfflineMutations();
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <Tab.Navigator
