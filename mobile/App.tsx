@@ -5,13 +5,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { addEventListener } from "@react-native-community/netinfo";
-import { Calendar, List } from "lucide-react-native";
+import { Calendar, List, SquareStackIcon } from "lucide-react-native";
 
 // --- Импорты экранов ---
 import ListScreen from "@/screens/ListScreen";
 import CalendarScreen from "@/screens/CalendarScreen";
 import CreateEntryScreen from "@/screens/CreateEntryScreen";
 import EditEntryScreen from "@/screens/EditEntryScreen";
+import StatsScreen from "@/screens/StatsScreen";
 import { useEntriesStore } from "@/store/useEntriesStore";
 
 const Tab = createBottomTabNavigator();
@@ -19,12 +20,13 @@ const Stack = createNativeStackNavigator();
 
 // --- Компонент навигации (вынесли отдельно для чистоты) ---
 function BottomTabsNavigator() {
-  const { setSelectedDate, setIsOnline, syncOfflineMutations } = useEntriesStore();
+  const { setSelectedDate, setIsOnline, syncOfflineMutations } =
+    useEntriesStore();
 
   useEffect(() => {
-    const unsubscribe = addEventListener(state => {
-      const online = state.isConnected ?? false; 
-      
+    const unsubscribe = addEventListener((state) => {
+      const online = state.isConnected ?? false;
+
       setIsOnline(online);
 
       if (online) {
@@ -69,6 +71,14 @@ function BottomTabsNavigator() {
         options={{
           title: "Список записей",
           tabBarIcon: ({ color, size }) => <List size={size} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Stats"
+        component={StatsScreen}
+        options={{
+          title: "Статистика",
+          tabBarIcon: ({ color, size }) => <SquareStackIcon size={size} color={color} />,
         }}
       />
     </Tab.Navigator>
