@@ -61,7 +61,7 @@ export default function StatsScreen() {
             <Type size={20} color="#10b981" />
           </View>
           <Text className="text-3xl font-bold text-slate-800">{stats.totalWords}</Text>
-          <Text className="text-sm text-slate-500 font-medium">Написано слов</Text>
+          <Text className="text-sm text-slate-500 font-medium">Всего слов</Text>
         </View>
 
         {/* Уникальных тэгов */}
@@ -96,15 +96,15 @@ export default function StatsScreen() {
         {stats.topTags.length === 0 ? (
           <Text className="text-slate-500 text-center py-4">Вы пока не используете тэги</Text>
         ) : (
-          stats.topTags.map(([tag, count], index) => {
+          stats.topTags.map(([tag, count]) => {
             // Вычисляем ширину полоски в процентах
             const percentage = Math.round((count / stats.maxTagCount) * 100);
             
             return (
               <View key={tag} className="mb-4 last:mb-0">
                 <View className="flex-row justify-between mb-1">
-                  <Text className="text-slate-700 font-medium">#{tag}</Text>
-                  <Text className="text-slate-500 font-bold">{count}</Text>
+                  <Text className="text-slate-600 font-medium">#{tag}</Text>
+                  <Text className="text-slate-400 font-bold">{count}</Text>
                 </View>
                 {/* Фоновая полоска */}
                 <View className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
